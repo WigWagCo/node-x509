@@ -1,6 +1,7 @@
 #include <cstring>
 #include <sstream>
 #include <x509.h>
+#include <glib.h>
 
 using namespace v8;
 
@@ -119,7 +120,7 @@ NAN_METHOD(verify) {
   X509_STORE_CTX_free(verify_ctx);
   BIO_free_all(cert_bio);
 
- info.GetReturnValue().Set(Nan::New(true));
+  info.GetReturnValue().Set(Nan::New(true));
 }
 
 
@@ -242,7 +243,7 @@ Local<Value> try_parse(const std::string& dataString) {
   stream << std::hex << X509_subject_name_hash(cert);
   Nan::Set(exports,
     Nan::New<String>("subjectHash").ToLocalChecked(),
-      Nan::New<String>(stream.str()).ToLocalChecked());
+    Nan::New<String>(stream.str()).ToLocalChecked());
 
   // Signature Algorithm
   int sig_alg_nid = OBJ_obj2nid(cert->sig_alg->algorithm);
@@ -370,7 +371,7 @@ Local<Value> try_parse(const std::string& dataString) {
     BIO_set_close(ext_bio, BIO_CLOSE);
 
     char *data = new char[bptr->length + 1];
-    BUF_strlcpy(data, bptr->data, bptr->length + 1);
+    g_strlcpy(data, bptr->data, bptr->length + 1);
     char *trimmed_data = trim(data, bptr->length);
 
     BIO_free(ext_bio);
@@ -424,7 +425,7 @@ Local<Value> parse_date(ASN1_TIME *date) {
   bio = BIO_new(BIO_s_mem());
   ASN1_TIME_print(bio, date);
   BIO_get_mem_ptr(bio, &bm);
-  BUF_strlcpy(formatted, bm->data, bm->length + 1);
+  g_strlcpy(formatted, bm->data, bm->length + 1);
   BIO_free(bio);
   args[0] = Nan::New<String>(formatted).ToLocalChecked();
 
