@@ -1,6 +1,7 @@
 #include <cstring>
 #include <sstream>
 #include <x509.h>
+#include <glib.h>
 
 using namespace v8;
 
@@ -398,7 +399,7 @@ Local<Value> try_parse(const std::string& dataString) {
     BIO_set_close(ext_bio, BIO_CLOSE);
 
     char *data = new char[bptr->length + 1];
-    BUF_strlcpy(data, bptr->data, bptr->length + 1);
+    g_strlcpy(data, bptr->data, bptr->length + 1);
     char *trimmed_data = trim(data, bptr->length);
 
     BIO_free(ext_bio);
@@ -453,7 +454,7 @@ Local<Value> parse_date(ASN1_TIME *date) {
   bio = BIO_new(BIO_s_mem());
   ASN1_TIME_print(bio, date);
   BIO_get_mem_ptr(bio, &bm);
-  BUF_strlcpy(formatted, bm->data, bm->length + 1);
+  g_strlcpy(formatted, bm->data, bm->length + 1);
   BIO_free(bio);
   args[0] = Nan::New<String>(formatted).ToLocalChecked();
 
